@@ -11,8 +11,8 @@ Model name is converted to lowercase for the collection name:
 - BlogPost -> "blogs" collection
 """
 
-from pydantic import BaseModel, Field
-from typing import Optional
+from pydantic import BaseModel, Field, HttpUrl
+from typing import Optional, List, Dict, Any
 
 # Example schemas (replace with your own):
 
@@ -38,11 +38,40 @@ class Product(BaseModel):
     category: str = Field(..., description="Product category")
     in_stock: bool = Field(True, description="Whether product is in stock")
 
-# Add your own schemas here:
-# --------------------------------------------------
+# Brand analysis schemas
 
-# Note: The Flames database viewer will automatically:
-# 1. Read these schemas from GET /schema endpoint
-# 2. Use them for document validation when creating/editing
-# 3. Handle all database operations (CRUD) directly
-# 4. You don't need to create any database endpoints!
+class Review(BaseModel):
+    source: Optional[str] = Field(None, description="Where the review was found")
+    author: Optional[str] = None
+    rating: Optional[float] = Field(None, ge=0, le=5)
+    title: Optional[str] = None
+    text: Optional[str] = None
+    url: Optional[str] = None
+
+class SentimentScores(BaseModel):
+    positive: float
+    negative: float
+    neutral: float
+    overall: float
+
+class SEOBasics(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    keywords: List[str] = []
+    h1: List[str] = []
+    h2: List[str] = []
+    h3: List[str] = []
+
+class BrandAnalysis(BaseModel):
+    url: HttpUrl
+    domain: str
+    favicon: Optional[str] = None
+    tech: List[str] = []
+    social_links: Dict[str, str] = {}
+    color_palette: List[str] = []
+    seo: SEOBasics
+    keywords: List[str]
+    reviews: List[Review] = []
+    sentiment: SentimentScores
+    summary: str
+    raw_samples: Dict[str, Any] = {}
